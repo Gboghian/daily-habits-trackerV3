@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Habits Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>⚡ NEXUS HABITS ⚡</h1>
+                    <p id="current-date"></p>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+                    <span id="theme-icon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Add New Habit -->
+            <section class="add-habit">
+                <h2>Add New Habit</h2>
+                <div class="habit-form">
+                    <div class="input-row">
+                        <input type="text" id="habit-input" placeholder="Enter a new habit (e.g., Drink 8 glasses of water)">
+                        <select id="category-select">
+                            <option value="">Select Category</option>
+                            <option value="health">🏃 Health & Fitness</option>
+                            <option value="productivity">💼 Productivity</option>
+                            <option value="learning">📚 Learning</option>
+                            <option value="mindfulness">🧘 Mindfulness</option>
+                            <option value="social">👥 Social</option>
+                            <option value="creative">🎨 Creative</option>
+                            <option value="personal">⭐ Personal</option>
+                        </select>
+                    </div>
+                    <div class="template-section">
+                        <button type="button" id="show-templates" onclick="toggleTemplates()">📋 Use Template</button>
+                        <div id="templates-container" class="templates-hidden">
+                            <div class="template-categories">
+                                <button class="template-btn" onclick="addTemplateHabit('Drink 8 glasses of water', 'health')">💧 Drink Water</button>
+                                <button class="template-btn" onclick="addTemplateHabit('Exercise for 30 minutes', 'health')">🏃 Exercise</button>
+                                <button class="template-btn" onclick="addTemplateHabit('Read for 30 minutes', 'learning')">📖 Read</button>
+                                <button class="template-btn" onclick="addTemplateHabit('Meditate for 10 minutes', 'mindfulness')">🧘 Meditate</button>
+                                <button class="template-btn" onclick="addTemplateHabit('Write in journal', 'personal')">📝 Journal</button>
+                                <button class="template-btn" onclick="addTemplateHabit('No phone for 1 hour', 'mindfulness')">📱 Phone Break</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="addHabit()">Add Habit</button>
+                </div>
+            </section>
+
+            <!-- Habits List -->
+            <section class="habits-section">
+                <div class="habits-header">
+                    <h2>Today's Habits</h2>
+                    <div class="filter-controls">
+                        <select id="category-filter" onchange="filterHabits()">
+                            <option value="">All Categories</option>
+                            <option value="health">🏃 Health & Fitness</option>
+                            <option value="productivity">💼 Productivity</option>
+                            <option value="learning">📚 Learning</option>
+                            <option value="mindfulness">🧘 Mindfulness</option>
+                            <option value="social">👥 Social</option>
+                            <option value="creative">🎨 Creative</option>
+                            <option value="personal">⭐ Personal</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="habits-container">
+                    <!-- Habits will be added here dynamically -->
+                </div>
+            </section>
+
+            <!-- Progress Summary -->
+            <section class="summary">
+                <h2>Progress Summary</h2>
+                <div class="summary-stats">
+                    <div class="stat">
+                        <span class="stat-number" id="completed-count">0</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="total-count">0</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="completion-rate">0%</span>
+                        <span class="stat-label">Success Rate</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="best-streak">0</span>
+                        <span class="stat-label">Best Streak</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Dashboard -->
+            <section class="analytics-section">
+                <div class="analytics-header">
+                    <h2>📊 Analytics Dashboard</h2>
+                    <div class="analytics-controls">
+                        <select id="analytics-timeframe" onchange="updateAnalytics()">
+                            <option value="7">Last 7 Days</option>
+                            <option value="30" selected>Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="365">Last Year</option>
+                        </select>
+                        <button onclick="exportAnalytics()" class="export-btn">📥 Export Report</button>
+                    </div>
+                </div>
+                
+                <!-- Key Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">📈</div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="overall-completion">0%</div>
+                            <div class="metric-label">Overall Completion</div>
+                            <div class="metric-trend" id="completion-trend">📊</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">🔥</div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="active-streaks">0</div>
+                            <div class="metric-label">Active Streaks</div>
+                            <div class="metric-trend" id="streak-trend">📊</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">🎯</div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="best-category">-</div>
+                            <div class="metric-label">Top Category</div>
+                            <div class="metric-trend" id="category-trend">📊</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">📅</div>
+                        <div class="metric-content">
+                            <div class="metric-value" id="perfect-days">0</div>
+                            <div class="metric-label">Perfect Days</div>
+                            <div class="metric-trend" id="perfect-trend">📊</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>📈 Progress Trends</h3>
+                        <canvas id="progress-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>🏷️ Category Breakdown</h3>
+                        <canvas id="category-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>📊 Habit Performance</h3>
+                        <div id="habit-performance-list" class="performance-list">
+                            <!-- Performance bars will be generated here -->
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>📅 Weekly Patterns</h3>
+                        <canvas id="weekly-pattern-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Insights Section -->
+                <div class="insights-section">
+                    <h3>💡 Smart Insights</h3>
+                    <div id="insights-container" class="insights-grid">
+                        <!-- Insights will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Habit Rankings -->
+                <div class="rankings-section">
+                    <h3>🏆 Habit Rankings</h3>
+                    <div class="rankings-tabs">
+                        <button class="tab-btn active" onclick="showRanking('consistency')">Most Consistent</button>
+                        <button class="tab-btn" onclick="showRanking('improving')">Most Improving</button>
+                        <button class="tab-btn" onclick="showRanking('challenging')">Most Challenging</button>
+                    </div>
+                    <div id="rankings-content" class="rankings-list">
+                        <!-- Rankings will be generated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weekly Calendar View -->
+            <section class="calendar-section">
+                <div class="calendar-header">
+                    <h2>📅 Weekly Progress</h2>
+                    <div class="calendar-nav">
+                        <button onclick="changeWeek(-1)" class="nav-btn">← Previous</button>
+                        <span id="current-week-range"></span>
+                        <button onclick="changeWeek(1)" class="nav-btn">Next →</button>
+                    </div>
+                </div>
+                <div id="weekly-calendar" class="weekly-calendar">
+                    <!-- Calendar will be generated here -->
+                </div>
+                <div class="calendar-legend">
+                    <span class="legend-item"><span class="legend-color perfect"></span> Perfect Day (100%)</span>
+                    <span class="legend-item"><span class="legend-color good"></span> Good Day (75%+)</span>
+                    <span class="legend-item"><span class="legend-color okay"></span> Okay Day (50%+)</span>
+                    <span class="legend-item"><span class="legend-color missed"></span> Needs Work (&lt;50%)</span>
+                </div>
+            </section>
+
+            <!-- Achievement System -->
+            <section class="achievements-section">
+                <h2>🏆 Achievements</h2>
+                <div id="achievements-container" class="achievements-grid">
+                    <!-- Achievements will be generated here -->
+                </div>
+                <div id="achievement-popup" class="achievement-popup hidden">
+                    <div class="popup-content">
+                        <button id="achievement-close-btn" class="popup-close-btn" aria-label="Close popup">&times;</button>
+                        <div class="achievement-celebration">🎉</div>
+                        <h3 id="popup-achievement-title">Achievement Unlocked!</h3>
+                        <p id="popup-achievement-description"></p>
+                        <button id="achievement-awesome-btn" class="popup-awesome-btn">Awesome!</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Smart Reminders -->
+            <section class="reminders-section">
+                <h2>⏰ Smart Reminders</h2>
+                <div class="reminder-controls">
+                    <button onclick="requestNotificationPermission()" id="enable-notifications">
+                        🔔 Enable Notifications
+                    </button>
+                    <button onclick="toggleRemindersPanel()" id="manage-reminders">
+                        ⚙️ Manage Reminders
+                    </button>
+                </div>
+                <div id="reminders-panel" class="reminders-panel hidden">
+                    <h3>Set Reminder Times</h3>
+                    <div class="reminder-time-slots">
+                        <div class="time-slot">
+                            <label>Morning Reminder:</label>
+                            <input type="time" id="morning-time" value="08:00">
+                            <label><input type="checkbox" id="morning-enabled"> Enabled</label>
+                        </div>
+                        <div class="time-slot">
+                            <label>Afternoon Reminder:</label>
+                            <input type="time" id="afternoon-time" value="14:00">
+                            <label><input type="checkbox" id="afternoon-enabled"> Enabled</label>
+                        </div>
+                        <div class="time-slot">
+                            <label>Evening Reminder:</label>
+                            <input type="time" id="evening-time" value="20:00">
+                            <label><input type="checkbox" id="evening-enabled"> Enabled</label>
+                        </div>
+                    </div>
+                    <div class="smart-suggestions" id="smart-suggestions">
+                        <!-- Smart suggestions will appear here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
